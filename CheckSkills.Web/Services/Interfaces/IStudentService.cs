@@ -15,4 +15,5 @@ public interface IStudentService
     Task<ServiceResponse<VerifyAccountRequestDto>> VerifyAccount(string token);
     Task<ServiceResponse<StudentResetPasswordRequestDto>> ResetPassword(StudentResetPasswordRequestDto request);
     Task<ServiceResponse<StudentForgotPasswordRequestDto>> ForgotPassword(StudentForgotPasswordRequestDto request);
+    Task SendEmailAsync(string userEmail, string message, string subject);
 }

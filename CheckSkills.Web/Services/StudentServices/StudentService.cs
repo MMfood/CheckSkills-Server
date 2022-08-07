@@ -106,7 +106,7 @@ namespace CheckSkills.Web.Services.StudentServices
 
             await _studentRepository.SaveAsync();
 
-            SendEmail(student.Email, token, "Verify Account");
+            await SendEmailAsync(student.Email, token, "Verify Account");
 
             response.Data = _mapper.Map<GetRequestStudentDto>(student);
 
@@ -182,7 +182,7 @@ namespace CheckSkills.Web.Services.StudentServices
             student.PasswordResetToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
             student.ResetTokenExpires = DateTime.Now.AddDays(1);
 
-            SendEmail(request.Email, $"You can reset password <p>{student.PasswordResetToken}<p>", "Forgot Password");
+            await SendEmailAsync(request.Email, $"You can reset password <p>{student.PasswordResetToken}<p>", "Forgot Password");
 
             _studentRepository.UpdateStudent(student);
             await _studentRepository.SaveAsync();
@@ -270,7 +270,7 @@ namespace CheckSkills.Web.Services.StudentServices
                 student.Email = request.Email;
                 student.VerificationToken = CreateToken(student);
                 student.VerifiedAt = null;
-                SendEmail(student.Email, student.VerificationToken, "VerifyAccount");
+                await SendEmailAsync(student.Email, student.VerificationToken, "VerifyAccount");
             }
 
             _studentRepository.UpdateStudent(student);
@@ -281,7 +281,7 @@ namespace CheckSkills.Web.Services.StudentServices
             return response;
         }
 
-        private void SendEmail(string userEmail, string message, string subject)
+        public async Task SendEmailAsync(string userEmail, string message, string subject)
         {
             var email = new MimeMessage();
             email.From.Add(MailboxAddress.Parse(_configuration.GetSection("EmailUsername").Value));
@@ -289,11 +289,13 @@ namespace CheckSkills.Web.Services.StudentServices
             email.Subject = subject;
             email.Body = new TextPart(TextFormat.Html) { Text = message };
 
-            using var smtp = new SmtpClient();
-            smtp.Connect(_configuration.GetSection("EmailHost").Value, 587, SecureSocketOptions.StartTls);
-            smtp.Authenticate(_configuration.GetSection("EmailUsername").Value, _configuration.GetSection("EmailPassword").Value);
-            smtp.Send(email);
-            smtp.Disconnect(true);
+            using (var smtp = new SmtpClient())
+            {
+                await smtp.ConnectAsync(_configuration.GetSection("EmailHost").Value, 587, SecureSocketOptions.StartTls);
+                await smtp.AuthenticateAsync(_configuration.GetSection("EmailUsername").Value, _configuration.GetSection("EmailPassword").Value);
+                await smtp.SendAsync(email);
+                await smtp.DisconnectAsync(true);
+            }
         }
 
         private async Task<RefreshToken> GenerateRefreshTokenAsync()

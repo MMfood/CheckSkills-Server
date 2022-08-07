@@ -1,6 +1,7 @@
 global using CheckSkills.Web.Data;
 global using Microsoft.EntityFrameworkCore;
 using CheckSkills.Web.Models;
+using CheckSkills.Web.Services.EmailService;
 using CheckSkills.Web.Services.Interfaces;
 using CheckSkills.Web.Services.Repository;
 using CheckSkills.Web.Services.StudentServices;
@@ -21,7 +22,10 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+builder.Services.AddScoped<IMessageWrapperRepository, MessageWrapperRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<IBackgroundEmailSenderService, BackgroundEmailSenderService>();
+builder.Services.AddSingleton<IHostedService, BackgroundEmailSenderTask>();
 
 builder.Services.AddDbContext<DataContext>(options =>
     {

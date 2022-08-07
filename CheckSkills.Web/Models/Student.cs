@@ -12,6 +12,7 @@
         public string? PasswordResetToken { get; set; }
         public DateTime? ResetTokenExpires { get; set; }
         public int Age { get; set; }
+        public List<MessageWrapper> MessageWrappers { get; set; } = new List<MessageWrapper>();
         public byte[]? PasswordHash { get; set; }
         public byte[]? PasswordSalt { get; set; }
         public string RefreshToken { get; set; } = string.Empty;

@@ -8,6 +8,6 @@ namespace CheckSkills.Web.Data
 
         public DbSet<Student> Students { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
-
+        public DbSet<MessageWrapper> MessageWrappers { get; set; }
     }
 }
